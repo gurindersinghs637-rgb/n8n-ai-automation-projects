@@ -1,0 +1,176 @@
+{
+  "name": "Weather Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "a35759d0-3b11-4555-ab16-cc47a9128123",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b855834-77b0-459a-9715-ea832ce3e1e1",
+              "name": "query",
+              "value": "={{ $json.query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "d548570c-e221-4f91-8483-63e9983534d8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "cityName": "={{ $json.query }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -32
+      ],
+      "id": "0e4fc239-50e9-4a3d-858c-2e90cd6799f4",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "u5VWqDGQaFEcEfjZ",
+          "name": "OpenWeatherMap account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=I m giving u the openweather api result which basically the details of the weather of any city. kindly use that information and give me the simple english   description of the weather . \nmain  {{ $json.weather[0].main }}\ndescription {{ $json.weather[0].description }}\ntemp {{ $json.main.temp }}\nfeels_like {{ $json.main.feels_like }}\nhumidity {{ $json.main.humidity }}\ncountry {{ $json.sys.country }}\nname {{ $json.name }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        -32
+      ],
+      "id": "42a65214-93b0-4a10-a62d-2fecb8ed01e7",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "a96xdbxdzf6D7owV",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c6f5aa8-70d8-420d-b117-aaa4f1741048",
+              "name": "Response ",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        -32
+      ],
+      "id": "76006567-a647-4fe4-97c5-d833b0806980",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "844e1fdf-1a8a-403d-9310-80e1b72b5a41",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8534048dc468b5322f91c457c114b0ebc65bf9327d820bb3deec8bbc93865d97"
+  },
+  "nodeGroups": [],
+  "id": "Adz9WoKd55vfZI1C",
+  "tags": []
+}
